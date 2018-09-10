@@ -37,7 +37,11 @@ public static void main(String[] args) throws IOException {
 	Elements departmentName = doc.select("div.item-list");
 	MinistryofMinisters(departmentName);
 	Elements image=doc.select("table>tbody>tr>td>div>div>img");
-	downloadImage(image);
+	//downloadImage(image);
+	nameofMinistryTheyHold.set(0, nameofMinistryTheyHold.get(0).replace("Ministry", ", Ministry"));
+	nameofMinistryTheyHold.set(0,nameofMinistryTheyHold.get(0).replace("Department", ", Department"));
+	
+	
 	for (int i=0;i<nameofMinistryTheyHold.size();i++) {
 	details.put(nameofCouncilMinister.get(i), nameofMinistryTheyHold.get(i));
 	}
@@ -50,8 +54,8 @@ private static void downloadImage(Elements image) throws IOException {
 	{
 	String url=image.get(i).attr("src");
 	URL in = new URL(url);
-    FileUtils.copyURLToFile(in, new File("D:\\Image\\image"+i+".jpg"));
-	
+    FileUtils.copyURLToFile(in, new File("D:\\Image\\"+i+"_"+nameofCouncilMinister.get(i).replace(" ","_")+".jpg"));
+    ;
 	}
 	
 	
