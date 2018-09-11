@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import org.apache.commons.io.FileUtils;
@@ -11,7 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class Grabber {
@@ -26,9 +27,9 @@ public class Grabber {
 	static public LinkedHashMap<String,String> details =new LinkedHashMap<String,String>();
 public static void main(String[] args) throws IOException {
 
-	Document doc = Jsoup.connect("https://www.india.gov.in/my-government/whos-who/council-ministers")
-			                      .proxy("gappsproxy.cognizant.com", 6050)
-			                      .get();
+	Document doc = Jsoup.connect("https://www.india.gov.in/my-government/whos-who/council-ministers").get();
+			                      //.proxy("gappsproxy.cognizant.com", 6050)
+			                     // .get();
 	
 	
 	log.info(doc.title());
@@ -38,6 +39,9 @@ public static void main(String[] args) throws IOException {
 	MinistryofMinisters(departmentName);
 	Elements image=doc.select("table>tbody>tr>td>div>div>img");
 	//downloadImage(image);
+	Elements contacts=doc.select("table>tbody>tr>td>a");
+	ministerContacts(contacts);
+	
 	nameofMinistryTheyHold.set(0, nameofMinistryTheyHold.get(0).replace("Ministry", ", Ministry"));
 	nameofMinistryTheyHold.set(0,nameofMinistryTheyHold.get(0).replace("Department", ", Department"));
 	
@@ -49,6 +53,17 @@ public static void main(String[] args) throws IOException {
 
 }
 	
+private static void ministerContacts(Elements contacts) {
+	// TODO Auto-generated method stub
+	LinkedHashMap<String,String> minContact=new LinkedHashMap<String,String>(); 
+	for(int i=0;i<contacts.size();i++)
+	{
+		minContact.put(contacts.get(i).ownText(), contacts.get(i).getElementsByAttribute("href").toString());
+	}
+	System.out.println(minContact);
+	
+}
+
 private static void downloadImage(Elements image) throws IOException {
 	for(int i=0;i<image.size();i++) 
 	{
