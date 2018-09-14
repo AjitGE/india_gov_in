@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -16,15 +17,19 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class Grabber {
+	static ArrayList<String> contact=new ArrayList<String>(3);
 	 static ArrayList<String> nameofCouncilMinister=new ArrayList<String>();
+	 static public LinkedHashMap< String, String> ministerDetails1= new LinkedHashMap< String, String>();
 	 static ArrayList<String> nameofMinistryTheyHold=new ArrayList<String>();
-	
+	 static ArrayList<String> links=new ArrayList<String>();
+	 static LinkedHashMap< String, String> contactsofEachMInister= new LinkedHashMap< String, String>();
+	 static ArrayList<ArrayList<String>> Segregatedlink=new ArrayList<ArrayList<String>>();
+	 
 	static Logger log;
 	static {
 		log = LogManager.getLogger(Grabber.class);
 	}
-	static public LinkedHashMap< String, LinkedHashMap<String,String>> ministerDetails= new LinkedHashMap< String, LinkedHashMap<String,String>>();
-	static public LinkedHashMap<String,String> details =new LinkedHashMap<String,String>();
+	static public LinkedHashMap< String, String> ministerDetails= new LinkedHashMap< String, String>();
 public static void main(String[] args) throws IOException {
 
 	Document doc = Jsoup.connect("https://www.india.gov.in/my-government/whos-who/council-ministers").get();
@@ -35,32 +40,58 @@ public static void main(String[] args) throws IOException {
 	log.info(doc.title());
 	Elements nameofMinisters = doc.select("span.field-content");
 	nameOfCouncilMinister(nameofMinisters);
+	ArrayList<String> n=new ArrayList<String>();
+	 ArrayList<String> m=new ArrayList<String>();
+	if(nameofMinisters.hasText()){
+		for (Element name:nameofMinisters){
+		 
+				n.add(name.parent().siblingElements().select("span.field-content").text());
+				if(name.parent().siblingElements().select("span.field-content").isEmpty()){
+					n.add(null);
+				}
+				m.add(name.parent().siblingElements().select("span.field-content").attr("href"));
+				//contactsofEachMInister.put(nameofCouncilMinister,)
+				
+}
+		
+		
 	Elements departmentName = doc.select("div.item-list");
 	MinistryofMinisters(departmentName);
 	Elements image=doc.select("table>tbody>tr>td>div>div>img");
 	//downloadImage(image);
 	Elements contacts=doc.select("table>tbody>tr>td>a");
-	ministerContacts(contacts);
+	contactsLink(contacts);
+	contacts=doc.select("span.field-content>a");
+	contactsLink(contacts);
 	
 	nameofMinistryTheyHold.set(0, nameofMinistryTheyHold.get(0).replace("Ministry", ", Ministry"));
 	nameofMinistryTheyHold.set(0,nameofMinistryTheyHold.get(0).replace("Department", ", Department"));
 	
 	
 	for (int i=0;i<nameofMinistryTheyHold.size();i++) {
-	details.put(nameofCouncilMinister.get(i), nameofMinistryTheyHold.get(i));
+		ministerDetails.put(nameofCouncilMinister.get(i), nameofMinistryTheyHold.get(i));
 	}
-	System.out.println(details);
-
+	System.out.println(ministerDetails);
+	}
 }
-	
+	public static void contactsLink(Elements contacts){
+		
+		int j=1;
+		for(int i=0;i<contacts.size();i++){
+		links.add(contacts.get(i).attr("href"));
+				}
+				
+	}
 private static void ministerContacts(Elements contacts) {
 	// TODO Auto-generated method stub
 	LinkedHashMap<String,String> minContact=new LinkedHashMap<String,String>(); 
 	for(int i=0;i<contacts.size();i++)
 	{
-		minContact.put(contacts.get(i).ownText(), contacts.get(i).getElementsByAttribute("href").toString());
+		
+		minContact.put(nameofCouncilMinister.get(i), contacts.get(i).getElementsByAttribute("href").toString());
 	}
 	System.out.println(minContact);
+	
 	
 }
 
